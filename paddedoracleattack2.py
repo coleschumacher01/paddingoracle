@@ -107,10 +107,6 @@ def attack(block):
 
 if __name__ == "__main__":
     ciphertext = sys.argv[1]
-    #blocks = [s[i:i + 2 * 16] for i in range(0, len(s), 2 * 16)]
-
-    #string = 'c3eaefed61bf18720dbe1ef46cb1d89353f8518024986a2a1fbc33df4e16ecc0'
-    #ciphertext = binascii.hexlify(cbc.encryptbinary(binascii.unhexlify(string), cbc.iv))
 
     blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
     toprintHex = ''

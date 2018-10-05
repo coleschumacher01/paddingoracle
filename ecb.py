@@ -20,7 +20,6 @@ def unpad(s):
 def encrypt(key, raw, topad=True):
     if topad:
         raw = pad(raw)
-    #print(binascii.hexlify(raw))
     cipher = AES.new(key, AES.MODE_ECB)
     return cipher.encrypt(raw)
 

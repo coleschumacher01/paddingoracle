@@ -16,16 +16,11 @@ def checkPadding(s, iv):
     padding = ''
 
     #get the full unencrypted text with padding while checking for validity
-    #try:
     s = binascii.unhexlify(s)
     plaintext = cbc.decryptbinary(s, iv, False)
     padding = binascii.hexlify(
         plaintext[-ord(plaintext[len(plaintext) - 1:]):])
     length = len(padding)
-    #except ValueError:
-    #    valid = False
-    #except TypeError:
-    #    valid = False
 
     #know that the number of padding values will equal
     #the last value so only need to check them for equality
