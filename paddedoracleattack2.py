@@ -106,13 +106,23 @@ def attack(block):
     return ciphertext
 
 if __name__ == "__main__":
-    #s = sys.argv[1]
+    ciphertext = sys.argv[1]
     #blocks = [s[i:i + 2 * 16] for i in range(0, len(s), 2 * 16)]
 
-    ciphertext = sys.argv[1]
+    #string = 'c3eaefed61bf18720dbe1ef46cb1d89353f8518024986a2a1fbc33df4e16ecc0'
     #ciphertext = binascii.hexlify(cbc.encryptbinary(binascii.unhexlify(string), cbc.iv))
-    blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
-    print blocks
 
-    print xorBlock(attack(blocks[0]), binascii.hexlify(cbc.iv))
-   
+    blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
+    toprintHex = ''
+    toprintPlaintext = ''
+
+    for i in range(len(blocks)):
+        if (i == 0):
+            lastcipher = binascii.hexlify(cbc.iv)
+        else:
+            lastcipher = blocks[i - 1]
+
+        #print 'plaintext: ' + string[32 * i:32 * (i + 1)]
+        toprintHex += xorBlock(attack(blocks[i]), lastcipher)
+    print('Hex output: ' + toprintHex)
+    print('Plaintext output: ' + binascii.b2a_qp(binascii.unhexlify(toprintHex)))

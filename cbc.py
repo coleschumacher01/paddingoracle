@@ -47,7 +47,6 @@ def encryptbinary(s, initializationVector):
     while currentstart < length:
 
         plaintext = s[currentstart:currentend]
-        print(binascii.hexlify(plaintext))
         currentcipher = encryptblock(lastcipher, plaintext)
             
         lastcipher = currentcipher
@@ -79,7 +78,6 @@ def decryptbinary(s, initializationVector, unpad):
     while currentstart < length:
 
         ciphertext = s[currentstart:currentend]
-        print(binascii.hexlify(ciphertext))
 
 
         #decrypt the current block, no reason to have it decrypted in ecb because
@@ -89,12 +87,6 @@ def decryptbinary(s, initializationVector, unpad):
         #move to the next block
         lastcipher = ciphertext
         currentstart, currentend = getrange(currentstart, currentend, length)
-
-    #print(len(lastcipher))
-    ##if len(lastcipher) == 32:
-     #   ciphertext = lastcipher[16:]
-     #   lastcipher = lastcipher[:16]
-     #   plaintext = plaintext[:len(plaintext) - 16] + decryptblock(lastcipher, ciphertext, False)
 
     #removes padding from the string as a whole if requested
     if unpad:
@@ -106,7 +98,6 @@ def decryptbinary(s, initializationVector, unpad):
 if __name__ == "__main__":
     myargs = ecb.getopts(sys.argv)
 
-    #try:
     if '-e' in myargs:
         plaintext = binascii.unhexlify(myargs['-e'])
         ciphertext = encryptbinary(plaintext, iv)
@@ -126,5 +117,3 @@ if __name__ == "__main__":
         ciphertext = binascii.unhexlify(myargs['-u'])
         plaintext = decryptbinary(ciphertext, iv, True)
         print('Plaintext: ' + binascii.b2a_qp(plaintext))
-    #except TypeError:
-    #    print("Invalid input: check to ensure that your string is of the correct length with valid characters")

@@ -8,7 +8,6 @@ key = binascii.unhexlify('00112233445566778899aabbccddeeff')
 #adds padding before encrypting
 def pad(s):
     pad_len = BLOCK_SIZE - len(s) % BLOCK_SIZE
-    print pad_len
     if (pad_len == 0):
         pad_len = BLOCK_SIZE
     return s + pad_len * chr(pad_len).encode('ascii')
