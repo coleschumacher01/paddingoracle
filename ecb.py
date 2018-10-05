@@ -9,6 +9,7 @@ key = binascii.unhexlify('00112233445566778899aabbccddeeff')
 def pad(s):
     #print(binascii.hexlify(s[:8]))
     pad_len = BLOCK_SIZE - len(s) % BLOCK_SIZE
+    print pad_len
     if (pad_len == 0):
         pad_len = BLOCK_SIZE
     return s + pad_len * chr(pad_len).encode('ascii')
@@ -18,8 +19,9 @@ def unpad(s):
     return s[:-ord(s[len(s) - 1:])]
 
 #encrypts the raw data given with the key after padding it
-def encrypt(key, raw):
-    raw = pad(raw)
+def encrypt(key, raw, topad = True):
+    if topad:
+        raw = pad(raw)
     #print(binascii.hexlify(raw))
     cipher = AES.new(key, AES.MODE_ECB)
     return cipher.encrypt(raw)
