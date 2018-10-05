@@ -11,21 +11,23 @@ def hexincrement(c):
     currentspot = ''
 
     if c.isdigit() and int(c) < 9:
-        currentspot == str(int(c) + 1)
+        currentspot = str(int(c) + 1)
     elif c.isdigit():
-        currentspot == 'a'
+        currentspot = 'a'
     elif currentspot == 'a':
-        currentspot == 'b'
+        currentspot = 'b'
     elif currentspot == 'b':
-        currentspot == 'c'
+        currentspot = 'c'
     elif currentspot == 'c':
-        currentspot == 'd'
+        currentspot = 'd'
     elif currentspot == 'd':
-        currentspot == 'e'
+        currentspot = 'e'
     elif currentspot == 'e':
-        currentspot == 'f'
+        currentspot = 'f'
     else:
-        currentspot == '0'
+        currentspot = '0'
+
+    print(currentspot)
     return currentspot
 
 #checks who many bytes are correctly padded
