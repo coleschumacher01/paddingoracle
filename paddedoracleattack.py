@@ -7,6 +7,7 @@ import sys
 #incerement an individual hex digit
 def hexincrement(c):
 
+    '''
     currentspot = ''
 
     if c.isdigit() and int(c) < 9:
@@ -25,18 +26,26 @@ def hexincrement(c):
         currentspot = 'f'
     else:
         currentspot = '0'
+    '''
 
-    return currentspot
+    c = int(c, 16) + 1
+
+    if (c <= 0xf):
+        c = '0' + c
+    elif (c >= 0xff):
+        c = c % 0xff
+
+    print('here:' + str(c))
+    return c
 
 #checks who many bytes are correctly padded
 def incrementNextPad(s, current):
     currentspot = s[len(s) - 2*(current + 1): len(s) - current*2]
-    newval = hexincrement(currentspot[1])
-    currentspot = currentspot[0] + newval
-    if newval == '0':
-        currentspot = hexincrement(currentspot[0]) + newval
+    newval = hexincrement(currentspot)
+    
+
     print(currentspot)
-    return s[:len(s) - 2*(current + 1)] + currentspot + s[len(s) - current*2:]
+    return s[:len(s) - 2*(current + 1)] + str(newval) + s[len(s) - current*2:]
 
 #checks to see how much of the block is corectly padded
 def checkIncrements(s, lastcipher, current):
@@ -57,7 +66,7 @@ def getBlockValue(lastcipher, currentcipher):
     currentpadding = 0
     fullstring = binascii.hexlify(lastcipher+currentcipher)
     currentcipher = binascii.hexlify(currentcipher)
-    lastciper = binascii.hexlify(lastcipher)
+    lastcipher = binascii.hexlify(lastcipher)
     print(fullstring)
     while currentpadding < 16:
         if paddingoracle.checkPadding(currentcipher, lastcipher):

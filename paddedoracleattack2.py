@@ -109,8 +109,8 @@ if __name__ == "__main__":
     #s = sys.argv[1]
     #blocks = [s[i:i + 2 * 16] for i in range(0, len(s), 2 * 16)]
 
-    string = '0102030405060708090a0b0c0d0e0f100102030405060708090a0b0c0d0e0f10'
-    ciphertext = binascii.hexlify(cbc.encryptbinary(binascii.unhexlify(string), cbc.iv))
+    ciphertext = sys.argv[1]
+    #ciphertext = binascii.hexlify(cbc.encryptbinary(binascii.unhexlify(string), cbc.iv))
     blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
     print blocks
 
