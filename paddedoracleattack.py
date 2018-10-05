@@ -7,7 +7,7 @@ def hexincrement(c):
 
     currrentspot = ''
 
-    if c.isdigit() add int(c) < 9:
+    if c.isdigit() and int(c) < 9:
         currentspot = str(int(c) + 1)
     elif c.isdigit():
         currentspot = 'a'
