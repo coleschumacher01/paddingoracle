@@ -57,6 +57,7 @@ def getBlockValue(lastcipher, currentcipher):
     currentpadding = 0
     fullstring = binascii.hexlify(lastcipher+currentcipher)
     currentcipher = binascii.hexlify(currentcipher)
+    lastciper = binascii.hexlify(lastcipher)
     print(fullstring)
     while currentpadding < 16:
         if paddingoracle.checkPadding(currentcipher, lastcipher):
