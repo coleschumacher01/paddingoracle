@@ -1,0 +1,45 @@
+import binascii
+import cbc
+import paddingoracle
+import sys
+
+def incrementNextPad(s, current):
+    currentspot = s[len(s) - 2*(current + 1): len(s) - current*2]
+
+    #increment the currentspot here
+
+    return s[:len(s) - 2*(current + 1)] + currentspot + s[len(s) - current*2:]
+
+#checks to see how much of the block is corectly padded
+def checkIncrements(s, current):
+    valid = False
+
+    #if incrementing a padding byte makes the padding invalid then it
+    #must already be correct and can be skiped
+    while not valid:
+        temp = s
+        current += 1
+        incrementNextPad(temp, current)
+        valid = paddingoracle.checkPadding(temp)
+    return current
+
+def getBlockValue(lastcipher, currentcipher):
+    currentpadding = 0
+    fullstring = binascii.hexlify(lastcipher+currentcipher)
+    print(fullstring)
+    while currentpadding < 16:
+        if paddingoracle.checkPadding(fullstring):
+            currentpadding = checkIncrements(fullstring, currentpadding)
+        else:
+            incrementNextPad(fullstring, currentpadding)
+
+#begin by breaking to code into the initial blocks
+try:
+    s = binascii.unhexlify(sys.argv[1])
+
+    lastcipher = cbc.iv
+    currentcipher = s[16]
+    getBlockValue(lastcipher, currentcipher)
+
+except TypeError:
+    print("Invalid input string")

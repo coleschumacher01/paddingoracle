@@ -9,7 +9,7 @@ import ecb
 import sys
 import binascii
 
-initializationVector = binascii.unhexlify('000102030405060708090a0b0c0d0e0f')
+iv = binascii.unhexlify('000102030405060708090a0b0c0d0e0f')
 
 #encrypts an individual block by xoring it with the last blocks cipher and then encrypting
 def encryptblock(lastcipher, plaintext):
@@ -32,7 +32,7 @@ def getrange(first, last, length):
     return last, last + 16
 
 #encryts the given data block by block
-def encryptbinary(s):
+def encryptbinary(s, initializationVector):
     length = len(s)
     currentstart = 0
     currentend = 16
@@ -63,7 +63,7 @@ def encryptbinary(s):
     return ciphertext
 
 #decrypts the data given and unpads it if told
-def decryptbinary(s, unpad):
+def decryptbinary(s, initializationVector, unpad):
     length = len(s)
     currentstart = 0
     currentend = 16
@@ -85,7 +85,6 @@ def decryptbinary(s, unpad):
         #decrypt the current block, no reason to have it decrypted in ecb because
         #it would need to be added back in for all nonerminal blocks
         plaintext += decryptblock(lastcipher, ciphertext, False)
-        print('plaintext: '+binascii.hexlify(plaintext))
 
         #move to the next block
         lastcipher = ciphertext
@@ -110,22 +109,22 @@ if __name__ == "__main__":
     try:
         if '-e' in myargs:
             plaintext = binascii.unhexlify(myargs['-e'])
-            ciphertext = encryptbinary(plaintext)
+            ciphertext = encryptbinary(plaintext, iv)
             print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
         elif '-d' in myargs:
             ciphertext = binascii.unhexlify(myargs['-d'])
-            plaintext = decryptbinary(ciphertext, True)
+            plaintext = decryptbinary(ciphertext, iv, True)
             print('Plaintext: ' + binascii.hexlify(plaintext))
 
         elif '-s' in myargs:
             plaintext = binascii.a2b_qp(myargs['-s'])
-            ciphertext = encryptbinary(plaintext)
+            ciphertext = encryptbinary(plaintext, iv)
             print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
         elif '-u' in myargs:
             ciphertext = binascii.unhexlify(myargs['-u'])
-            plaintext = decryptbinary(ciphertext, True)
+            plaintext = decryptbinary(ciphertext, iv, True)
             print('Plaintext: ' + binascii.b2a_qp(plaintext))
     except TypeError:
         print("Invalid input: check to ensure that your string is of the correct length with valid characters")

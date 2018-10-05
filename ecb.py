@@ -7,7 +7,6 @@ key = binascii.unhexlify('00112233445566778899aabbccddeeff')
 
 #adds padding before encrypting
 def pad(s):
-    #print(binascii.hexlify(s[:8]))
     pad_len = BLOCK_SIZE - len(s) % BLOCK_SIZE
     print pad_len
     if (pad_len == 0):
@@ -19,7 +18,7 @@ def unpad(s):
     return s[:-ord(s[len(s) - 1:])]
 
 #encrypts the raw data given with the key after padding it
-def encrypt(key, raw, topad = True):
+def encrypt(key, raw, topad=True):
     if topad:
         raw = pad(raw)
     #print(binascii.hexlify(raw))
@@ -28,7 +27,7 @@ def encrypt(key, raw, topad = True):
 
 #decrypts the data given with the key and unpads it if told , the unpad var is added to simplify
 #the oracle program and decryption of individual blocks
-def decrypt(key, enc, tounpad = True):
+def decrypt(key, enc, tounpad=True):
     cipher = AES.new(key, AES.MODE_ECB)
     dec = cipher.decrypt(enc)
     toreturn = dec
@@ -44,6 +43,7 @@ def getopts(argv):
             opts[argv[0]] = argv[1]
         argv = argv[1:]
     return opts
+
 
 #the main command the executes all functions of the program
 if __name__ == "__main__":
@@ -70,4 +70,3 @@ if __name__ == "__main__":
         print("python ecb.py -s 'this is cool'")
         print("python ecb.py -d d25a16fe349cded7f6a2f2446f6da1c2")
         print("python ecb.py -u 9b43953eeb6c3b7b7971a8bec1a90819")
-    
