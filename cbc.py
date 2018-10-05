@@ -12,13 +12,13 @@ initializationVector = binascii.unhexlify('07060504030201000001020304050607')
 
 #encrypts an individual block by xoring it with the last blocks cipher and then encrypting
 def encryptblock(lastcipher, plaintext):
-    #block = bytes(a ^ b for a, b in zip(lastcipher, plaintext))
-    return ecb.encrypt(ecb.key, plaintext)#block)
+    block = ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(lastcipher, plaintext))
+    return ecb.encrypt(ecb.key, block)
 
 #decrypts the given blok and then xors it with the revious block
 def decryptblock(lastcipher, ciphertext, unpad):
     block = ecb.decrypt(ecb.key, ciphertext, unpad)
-    return block#bytes(a ^ b for a, b in zip(lastcipher, block))
+    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(lastcipher, block))
 
 #gets the range of data in the current block
 def getrange(first, last, length):
@@ -110,4 +110,4 @@ if __name__ == "__main__":
             plaintext = decryptbinary(ciphertext, True)
             print('Plaintext: ' + binascii.b2a_qp(plaintext))
     except TypeError:
-        print("Invalid input: check to ensure that your string is of the correct legth with valid charachters")
+        print("Invalid input: check to ensure that your string is of the correct length with valid characters")
