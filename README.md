@@ -5,4 +5,5 @@ The commands can be run with python2 by using the commands python ecb.py <op> <s
 The padding oracle and padded oracle attack only need to be run with python paddingoracle.py <ciphertoworkwith>.
 The padding oracle returns true or false depending on if the padding in the last block of the cipher is correct.
 The padding oracle attack will take the input string and output its plaintext without calling the decrypt methods
-from either cbc or ecb. 
+from either cbc or ecb. All objectives including the extra credit were achieved. encrypt the given string with
+cbc.py and option -s and then give that string to the padding oracle attack file.
