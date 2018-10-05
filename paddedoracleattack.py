@@ -3,29 +3,32 @@ import cbc
 import paddingoracle
 import sys
 
+
+#incerement an individual hex digit
 def hexincrement(c):
 
-    currrentspot = ''
+    print('increment ' + c)
+    currentspot = ''
 
     if c.isdigit() and int(c) < 9:
-        currentspot = str(int(c) + 1)
+        currentspot == str(int(c) + 1)
     elif c.isdigit():
-        currentspot = 'a'
-    elif currentspot = 'a':
-        currentspot = 'b'
-    elif currentspot = 'b':
-        currentspot = 'c'
-    elif currentspot = 'c':
-        currentspot = 'd'
-    elif currentspot = 'd':
-        currentspot = 'e'
-    elif currentspot = 'e':
-        currentspot = 'f'
-    else currentspot = 'f':
-        currentspot = '0'
-    return currrentspot
+        currentspot == 'a'
+    elif currentspot == 'a':
+        currentspot == 'b'
+    elif currentspot == 'b':
+        currentspot == 'c'
+    elif currentspot == 'c':
+        currentspot == 'd'
+    elif currentspot == 'd':
+        currentspot == 'e'
+    elif currentspot == 'e':
+        currentspot == 'f'
+    else:
+        currentspot == '0'
+    return currentspot
 
-
+#checks who many bytes are correctly padded
 def incrementNextPad(s, current):
     currentspot = s[len(s) - 2*(current + 1): len(s) - current*2]
     
@@ -36,7 +39,7 @@ def incrementNextPad(s, current):
     return s[:len(s) - 2*(current + 1)] + currentspot + s[len(s) - current*2:]
 
 #checks to see how much of the block is corectly padded
-def checkIncrements(s, current):
+def checkIncrements(s, lastcipher, current):
     valid = False
 
     #if incrementing a padding byte makes the padding invalid then it
@@ -44,8 +47,9 @@ def checkIncrements(s, current):
     while not valid:
         temp = s
         current += 1
-        incrementNextPad(temp, current)
-        valid = paddingoracle.checkPadding(temp)
+        temp = incrementNextPad(temp, current)
+        print(temp)
+        valid = paddingoracle.checkPadding(temp, lastcipher)
     return current
 
 def getBlockValue(lastcipher, currentcipher):
@@ -53,18 +57,16 @@ def getBlockValue(lastcipher, currentcipher):
     fullstring = binascii.hexlify(lastcipher+currentcipher)
     print(fullstring)
     while currentpadding < 16:
-        if paddingoracle.checkPadding(fullstring):
-            currentpadding = checkIncrements(fullstring, currentpadding)
+        if paddingoracle.checkPadding(fullstring, lastcipher):
+            currentpadding = checkIncrements(fullstring, lastcipher, currentpadding)
         else:
             incrementNextPad(fullstring, currentpadding)
 
 #begin by breaking to code into the initial blocks
-try:
-    s = binascii.unhexlify(sys.argv[1])
 
-    lastcipher = cbc.iv
-    currentcipher = s[16]
-    getBlockValue(lastcipher, currentcipher)
+s = binascii.unhexlify(sys.argv[1])
 
-except TypeError:
-    print("Invalid input string")
+lastcipher = cbc.iv
+currentcipher = s[:16]
+getBlockValue(lastcipher, currentcipher)
+

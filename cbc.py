@@ -106,25 +106,25 @@ def decryptbinary(s, initializationVector, unpad):
 if __name__ == "__main__":
     myargs = ecb.getopts(sys.argv)
 
-    try:
-        if '-e' in myargs:
-            plaintext = binascii.unhexlify(myargs['-e'])
-            ciphertext = encryptbinary(plaintext, iv)
-            print('Ciphertext: ' + binascii.hexlify(ciphertext))
+    #try:
+    if '-e' in myargs:
+        plaintext = binascii.unhexlify(myargs['-e'])
+        ciphertext = encryptbinary(plaintext, iv)
+        print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
-        elif '-d' in myargs:
-            ciphertext = binascii.unhexlify(myargs['-d'])
-            plaintext = decryptbinary(ciphertext, iv, True)
-            print('Plaintext: ' + binascii.hexlify(plaintext))
+    elif '-d' in myargs:
+        ciphertext = binascii.unhexlify(myargs['-d'])
+        plaintext = decryptbinary(ciphertext, iv, True)
+        print('Plaintext: ' + binascii.hexlify(plaintext))
 
-        elif '-s' in myargs:
-            plaintext = binascii.a2b_qp(myargs['-s'])
-            ciphertext = encryptbinary(plaintext, iv)
-            print('Ciphertext: ' + binascii.hexlify(ciphertext))
+    elif '-s' in myargs:
+        plaintext = binascii.a2b_qp(myargs['-s'])
+        ciphertext = encryptbinary(plaintext, iv)
+        print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
-        elif '-u' in myargs:
-            ciphertext = binascii.unhexlify(myargs['-u'])
-            plaintext = decryptbinary(ciphertext, iv, True)
-            print('Plaintext: ' + binascii.b2a_qp(plaintext))
-    except TypeError:
-        print("Invalid input: check to ensure that your string is of the correct length with valid characters")
+    elif '-u' in myargs:
+        ciphertext = binascii.unhexlify(myargs['-u'])
+        plaintext = decryptbinary(ciphertext, iv, True)
+        print('Plaintext: ' + binascii.b2a_qp(plaintext))
+    #except TypeError:
+    #    print("Invalid input: check to ensure that your string is of the correct length with valid characters")
