@@ -4,6 +4,7 @@ It breaks up a string into blocks and either encrypts or decrypts it.
 Author Cole Schumacher
 '''
 
+from Crypto.Cipher import XOR
 import ecb
 import sys
 import binascii
@@ -12,13 +13,16 @@ initializationVector = binascii.unhexlify('07060504030201000001020304050607')
 
 #encrypts an individual block by xoring it with the last blocks cipher and then encrypting
 def encryptblock(lastcipher, plaintext):
-    #block = bytes(a ^ b for a, b in zip(lastcipher, plaintext))
-    return ecb.encrypt(ecb.key, plaintext)#block)
+    toXOR = XOR.new(lastcipher)
+    block = toXOR.encrypt(plaintext)
+    return ecb.encrypt(ecb.key, block)
 
 #decrypts the given blok and then xors it with the revious block
 def decryptblock(lastcipher, ciphertext, unpad):
     block = ecb.decrypt(ecb.key, ciphertext, unpad)
-    return block#bytes(a ^ b for a, b in zip(lastcipher, block))
+    toXOR = XOR.new(lastcipher)
+    block = toXOR.decrypt(ciphertext)
+    return block
 
 #gets the range of data in the current block
 def getrange(first, last, length):
@@ -70,10 +74,13 @@ def decryptbinary(s, unpad):
     while currentstart < length:
 
         ciphertext = s[currentstart:currentend]
+        print(binascii.hexlify(ciphertext))
+
 
         #decrypt the current block, no reason to have it decrypted in ecb because
         #it would need to be added back in for all nonerminal blocks
         plaintext += decryptblock(lastcipher, ciphertext, False)
+        print('plaintext: '+binascii.hexlify(plaintext))
 
         #move to the next block
         lastcipher = ciphertext
@@ -89,25 +96,26 @@ def decryptbinary(s, unpad):
 if __name__ == "__main__":
     myargs = ecb.getopts(sys.argv)
 
-    try:
-        if '-e' in myargs:
-            plaintext = binascii.unhexlify(myargs['-e'])
-            ciphertext = encryptbinary(plaintext)
-            print('Ciphertext: ' + binascii.hexlify(ciphertext))
+    #try:
+    if '-e' in myargs:
+        plaintext = binascii.unhexlify(myargs['-e'])
+        ciphertext = encryptbinary(plaintext)
+        print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
-        elif '-d' in myargs:
-            ciphertext = binascii.unhexlify(myargs['-d'])
-            plaintext = decryptbinary(ciphertext, True)
-            print('Plaintext: ' + binascii.hexlify(plaintext))
+    elif '-d' in myargs:
+        ciphertext = binascii.unhexlify(myargs['-d'])
+        plaintext = decryptbinary(ciphertext, True)
+        print('Plaintext: ' + binascii.hexlify(plaintext))
 
-        elif '-s' in myargs:
-            plaintext = binascii.a2b_qp(myargs['-s'])
-            ciphertext = encryptbinary(plaintext)
-            print('Ciphertext: ' + binascii.hexlify(ciphertext))
+    elif '-s' in myargs:
+        plaintext = binascii.a2b_qp(myargs['-s'])
+        ciphertext = encryptbinary(plaintext)
+        print('Ciphertext: ' + binascii.hexlify(ciphertext))
 
-        elif '-u' in myargs:
-            ciphertext = binascii.unhexlify(myargs['-u'])
-            plaintext = decryptbinary(ciphertext, True)
-            print('Plaintext: ' + binascii.b2a_qp(plaintext))
-    except TypeError:
-        print("Invalid input: check to ensure that your string is of the correct legth with valid charachters")
+    elif '-u' in myargs:
+        ciphertext = binascii.unhexlify(myargs['-u'])
+        plaintext = decryptbinary(ciphertext, True)
+        print('Plaintext: ' + binascii.b2a_qp(plaintext))
+    #except TypeError as error:
+    #    print(error)
+    #    print("Invalid input: check to ensure that your string is of the correct legth with valid charachters")
