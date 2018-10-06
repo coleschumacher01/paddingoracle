@@ -42,11 +42,12 @@ def incrementByte(s, index):
 def bruteforceByte(block1, block2, index):
     while(not paddingoracle.checkPadding(block1 + block2, cbc.iv)):
         block1 = incrementByte(block1, index)
-        print 'block1: ' + block1
 
     return block1
 
 def checkPaddingLength(garbage, block, paddingLength):
+    if paddingLength == 16:
+        return 16
     if (paddingoracle.checkPadding(incrementByte(garbage, 16 - (paddingLength + 1)) + block, cbc.iv)):
             return paddingLength
     else:
@@ -95,17 +96,13 @@ def attack(block):
     ciphertext = '00000000000000000000000000000000'
 
     paddingLength = 1
-    while paddingLength < 16:
+    while paddingLength <= 16:
         garbage = bruteforceByte(garbage, block, 16 - paddingLength)
         paddingLength = checkPaddingLength(garbage, block, paddingLength)
         garbage, ciphertext = nextIteration(garbage,ciphertext, paddingLength)
         
         paddingLength = paddingLength + 1
-        print paddingLength
 
-    
-    garbage = bruteforceByte(garbage, block, 0)
-    garbage, ciphertext = nextIteration(garbage, ciphertext, 16)
     return ciphertext
 
 if __name__ == "__main__":
@@ -117,5 +114,5 @@ if __name__ == "__main__":
     blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
     print blocks
 
-    print attack(blocks[0])
+    print xorBlock(attack(blocks[0]), binascii.hexlify(cbc.iv))
    
