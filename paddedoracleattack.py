@@ -3,76 +3,122 @@ import cbc
 import paddingoracle
 import sys
 
+def xorByte(block1, block2, index):
+    byte1 = block1[2*index:2*(index + 1)]
+    byte2 = block2[2*index:2*(index + 1)]
 
-#incerement an individual hex digit
-def hexincrement(c):
+    byte1 = int(byte1, 16)
+    byte2 = int(byte2, 16)
 
-    '''
-    currentspot = ''
-
-    if c.isdigit() and int(c) < 9:
-        currentspot = str(int(c) + 1)
-    elif c.isdigit():
-        currentspot = 'a'
-    elif currentspot == 'a':
-        currentspot = 'b'
-    elif currentspot == 'b':
-        currentspot = 'c'
-    elif currentspot == 'c':
-        currentspot = 'd'
-    elif currentspot == 'd':
-        currentspot = 'e'
-    elif currentspot == 'e':
-        currentspot = 'f'
-    else:
-        currentspot = '0'
-    '''
-
-    c = int(c, 16) + 1
-
-    if (c <= 0xf):
-        c = '0' + c
-    elif (c >= 0xff):
-        c = c % 0xff
-
-    return c
-
-#checks who many bytes are correctly padded
-def incrementNextPad(s, current):
-    currentspot = s[len(s) - 2*(current + 1): len(s) - current*2]
-    newval = hexincrement(currentspot)
+    byte = byte1 ^ byte2
     
-    return s[:len(s) - 2*(current + 1)] + str(newval) + s[len(s) - current*2:]
+    byte = format(byte, 'x')
 
-#checks to see how much of the block is corectly padded
-def checkIncrements(s, lastcipher, current):
-    valid = False
+    if (len(byte) < 2):
+        byte = '0' + byte
 
-    #if incrementing a padding byte makes the padding invalid then it
-    #must already be correct and can be skiped
-    while not valid:
-        temp = lastcipher
-        current += 1
-        temp = incrementNextPad(temp, current)
-        valid = paddingoracle.checkPadding(s, temp)
-    return current
+    
+    return byte
 
-def getBlockValue(lastcipher, currentcipher):
-    currentpadding = 0
-    fullstring = binascii.hexlify(lastcipher+currentcipher)
-    currentcipher = binascii.hexlify(currentcipher)
-    lastcipher = binascii.hexlify(lastcipher)
-    while currentpadding < 16:
-        if paddingoracle.checkPadding(currentcipher, lastcipher):
-            currentpadding = checkIncrements(currentcipher, lastcipher, currentpadding)
+def xorBlock(block1, block2):
+    newblock = ''
+    for i in range(16):
+        newblock += xorByte(block1, block2, i)
+
+    return newblock
+
+
+def incrementByte(s, index):
+    byte = s[2*index:2*(index + 1)]
+    
+    byte = int(byte, 16) + 1
+    byte = format(byte, 'x')
+
+    if (len(byte) < 2):
+        byte = '0' + byte
+
+    return s[:2*index] + byte + s[2*(index + 1):]
+
+def bruteforceByte(block1, block2, index):
+    while(not paddingoracle.checkPadding(block1 + block2, cbc.iv)):
+        block1 = incrementByte(block1, index)
+
+    return block1
+
+def checkPaddingLength(garbage, block, paddingLength):
+    if paddingLength == 16:
+        return 16
+    if (paddingoracle.checkPadding(incrementByte(garbage, 16 - (paddingLength + 1)) + block, cbc.iv)):
+            return paddingLength
+    else:
+        i = paddingLength + 1
+        while i < 16:
+            if (paddingoracle.checkPadding(incrementByte(garbage, 16 - (i + 1)) + block, cbc.iv)):
+                return i
+            else:
+                i = i + 1
+
+def nextIteration(garbage, ciphertext, paddingLength):
+    padByte = format(paddingLength, 'x')
+
+    if (len(padByte) < 2):
+        padByte = '0' + padByte
+    
+    padblock = ''
+    for i in range(16 - paddingLength):
+        padblock += '00'
+
+    for i in range(paddingLength):
+        padblock += padByte
+
+    ciphertext = xorBlock(garbage, padblock)
+
+
+    padByte = format(paddingLength + 1, 'x')
+
+    if (len(padByte) < 2):
+        padByte = '0' + padByte
+    
+    padblock = ''
+    for i in range(16 - paddingLength):
+        padblock += '00'
+
+    for i in range(paddingLength):
+        padblock += padByte
+
+    garbage = xorBlock(ciphertext, padblock)
+ 
+    return garbage, ciphertext
+
+
+def attack(block):
+    garbage = '00000000000000000000000000000000'
+    ciphertext = '00000000000000000000000000000000'
+
+    paddingLength = 1
+    while paddingLength <= 16:
+        garbage = bruteforceByte(garbage, block, 16 - paddingLength)
+        paddingLength = checkPaddingLength(garbage, block, paddingLength)
+        garbage, ciphertext = nextIteration(garbage,ciphertext, paddingLength)
+        
+        paddingLength = paddingLength + 1
+
+    return ciphertext
+
+if __name__ == "__main__":
+    ciphertext = sys.argv[1]
+
+    blocks = [ciphertext[i:i + 2 * 16] for i in range(0, len(ciphertext), 2 * 16)]
+    toprintHex = ''
+    toprintPlaintext = ''
+
+    for i in range(len(blocks)):
+        if (i == 0):
+            lastcipher = binascii.hexlify(cbc.iv)
         else:
-            lastcipher = incrementNextPad(lastcipher, currentpadding)
+            lastcipher = blocks[i - 1]
 
-#begin by breaking to code into the initial blocks
-
-s = binascii.unhexlify(sys.argv[1])
-
-lastcipher = cbc.iv
-currentcipher = s[:16]
-getBlockValue(lastcipher, currentcipher)
-
+        #print 'plaintext: ' + string[32 * i:32 * (i + 1)]
+        toprintHex += xorBlock(attack(blocks[i]), lastcipher)
+    print('Hex output: ' + toprintHex)
+    print('Plaintext output: ' + binascii.b2a_qp(binascii.unhexlify(toprintHex)))
