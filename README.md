@@ -1,5 +1,5 @@
 # paddingoracle
-Authors: CSole Schumacher, Alex Morgan
+Authors: Cole Schumacher, Alex Morgan
 This project coinsists of four major components; ecb.py, cbc.py, paddingoracle.py and paddedoracleattack.py.
 ecb.py and cbc.py work as directed and offer four different options -e, -d, -u and -s.
 The commands can be run with python2 by using the commands python ecb.py <op> <stringtoworkwith>
